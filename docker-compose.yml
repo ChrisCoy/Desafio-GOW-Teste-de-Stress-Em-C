@@ -12,11 +12,13 @@ services:
     volumes:
       - ./db-data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: 1.2G
+          cpus: "0.75"
+          memory: 1.250G
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d challenge"]
       interval: 5s
@@ -36,12 +38,12 @@ services:
     environment:
       INSTANCE_ID: "first"
     expose:
-      - "8080"
+      - "80"
     deploy:
       resources:
         limits:
-          cpus: "0.3"
-          memory: 768M
+          cpus: "0.25"
+          memory: 512M
 
   api2:
     build:
@@ -56,22 +58,24 @@ services:
     environment:
       INSTANCE_ID: "second"
     expose:
-      - "8080"
+      - "80"
     deploy:
       resources:
         limits:
-          cpus: "0.3"
-          memory: 768M
+          cpus: "0.25"
+          memory: 512M
 
   redis:
     image: redis:alpine
     container_name: redis
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     deploy:
       resources:
         limits:
-          cpus: "0.15"
-          memory: 128M
+          cpus: "0.25"
+          memory: 256M
 
   nginx:
     image: nginx:alpine
@@ -86,8 +90,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.15"
-          memory: 128M
+          cpus: "0.25"
+          memory: 512M
 
 volumes:
   db-data:
