@@ -361,12 +361,14 @@ void handle_programadores_request(struct http_request_s *request)
     return;
   }
 
-  printf("Programador %s %s inserido com sucesso.\n", prog->nome, prog->apelido);
-  fflush(stdout);
-
   free_programador(prog);
   PQclear(res);
 
+  char *location = malloc(strlen("/programadores/") + strlen(uuid_str) + 1);
+  strcpy(location, "/programadores/");
+  strcat(location, uuid_str);
+
+  http_response_header(response, "Location", location);
   http_response_status(response, 201);
   http_response_body(response, "ok", strlen("ok"));
   http_respond(request, response);
