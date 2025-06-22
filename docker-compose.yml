@@ -12,8 +12,6 @@ services:
     volumes:
       - ./db-data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
     deploy:
       resources:
         limits:
@@ -69,8 +67,6 @@ services:
     image: redis:alpine
     container_name: redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     deploy:
       resources:
         limits:
