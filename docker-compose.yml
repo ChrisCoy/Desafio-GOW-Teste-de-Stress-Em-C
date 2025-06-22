@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: challenge
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 1.5G
+
+  api1:
+    build:
+      context: ./ # pasta onde está o Dockerfile acima
+      dockerfile: Dockerfile
+    container_name: api1
+    image: api1:latest
+    # restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      INSTANCE_ID: "first"
+    expose:
+      - "80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 512M
+
+  api2:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: api2
+    image: api2:latest
+    # restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      INSTANCE_ID: "second"
+    expose:
+      - "80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 512M
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    depends_on:
+      - api1
+      - api2
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 512M
+
+volumes:
+  db-data:
