@@ -17,27 +17,33 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.75"
-          memory: 1.5G
+          cpus: "0.6"
+          memory: 1.2G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d challenge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   api1:
     build:
-      context: ./ # pasta onde está o Dockerfile acima
+      context: ./
       dockerfile: Dockerfile
     container_name: api1
     image: api1:latest
-    # restart: unless-stopped
+    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       INSTANCE_ID: "first"
     expose:
-      - "80"
+      - "8080"
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: 512M
+          cpus: "0.3"
+          memory: 768M
 
   api2:
     build:
@@ -45,18 +51,19 @@ services:
       dockerfile: Dockerfile
     container_name: api2
     image: api2:latest
-    # restart: unless-stopped
+    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       INSTANCE_ID: "second"
     expose:
-      - "80"
+      - "8080"
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: 512M
+          cpus: "0.3"
+          memory: 768M
 
   redis:
     image: redis:alpine
@@ -67,8 +74,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: 256M
+          cpus: "0.15"
+          memory: 128M
 
   nginx:
     image: nginx:alpine
@@ -83,8 +90,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: 512M
+          cpus: "0.15"
+          memory: 128M
 
 volumes:
   db-data:

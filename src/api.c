@@ -6,10 +6,10 @@
 #include <hiredis/hiredis.h>
 #include <uuid/uuid.h>
 
-// #define PG_HOST "db"
-#define PG_HOST "host.docker.internal" // Use this for local development with Docker
-// #define REDIS_HOST "redis"
-#define REDIS_HOST  "host.docker.internal" // Use this for local development with Docker
+#define PG_HOST "db"
+// #define PG_HOST "host.docker.internal"
+#define REDIS_HOST "redis"
+// #define REDIS_HOST  "host.docker.internal"
 
 #define PORT 8080
 
@@ -151,6 +151,11 @@ struct programador *extract_programador_from_json(json_value *value)
     return NULL;
   }
 
+  prog->stack = strdup("{}");
+  prog->nome[0] = '\0';
+  prog->apelido[0] = '\0';
+  prog->nascimento[0] = '\0';
+
   for (unsigned int i = 0; i < value->u.object.length; ++i)
   {
     json_object_entry entry = value->u.object.values[i];
@@ -211,7 +216,6 @@ struct programador *extract_programador_from_json(json_value *value)
 
       if (entry.value->u.array.length == 0)
       {
-        prog->stack = strdup("{}");
         continue;
       }
 

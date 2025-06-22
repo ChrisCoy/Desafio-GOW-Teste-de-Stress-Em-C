@@ -1,5 +1,1 @@
-how to run:
-1. Up the docker container: `npm run docker:up`
-
-how to test:
-2. Run the k6 test: `npm run test:load`
+how to run: `scripts/run.sh`
